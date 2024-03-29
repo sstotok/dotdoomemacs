@@ -36,7 +36,7 @@
 
 #+title: Dot Doom Emacs
 #+author: Totok Sulistiomono
-#+email: s.totok@gmail.com
+#+email: sstotok@gmail.com
 
 This is my Doom Emacs configuration, originally forked from [[https://github.com/zzamboni/dot-doom][zzamboni/dot-doom.git]].
 
@@ -140,11 +140,11 @@ This is my Doom Emacs configuration, originally forked from [[https://github.com
   - [[#blame][Blame]]
   - [[#blamer][Blamer]]
   - [[#forge][Forge]]
-    - [[#1st-step-create-a-token-for-your-forge][1st Step: Create a token for your forge.]]
-    - [[#2nd-step-register-your-username-for-your-forge][2nd Step: Register your username for your forge]]
-    - [[#3rd-step-add-the-following-to-your-authinfogpg][3rd Step: Add the following to your =~/.authinfo.gpg=.]]
-    - [[#4th-step-startup-your-magit][4th Step: Startup your magit]]
-    - [[#pull-all-forge-topics-with--f-evil-users][Pull all forge topics with =@ f= (evil users)]]
+    - [[#create-a-token-for-your-forge][Create a token for your forge.]]
+    - [[#register-your-username-for-your-forge][Register your username for your forge]]
+    - [[#add-the-following-to-your-authinfogpg][Add the following to your =~/.authinfo.gpg=.]]
+    - [[#add-a-remote-name-that-forge-can-understand][Add a remote name that Forge can understand]]
+    - [[#startup-your-magit][Startup your magit]]
 - [[#project-management][Project Management]]
   - [[#projectel][project.el]]
     - [[#overriding-the-projectel-project-directory][Overriding the project.el project directory]]
@@ -1582,9 +1582,8 @@ and braces.
 
 Ref:
 - [[https://www.masteringemacs.org/article/keeping-secrets-in-emacs-gnupg-auth-sources][Keeping Secrets in Emacs with GnuPG and Auth Sources]].
-- [[https://docs.doomemacs.org/v21.12/modules/tools/magit/][doom emacs: forge setting]].
-- [[https://gist.github.com/Azeirah/542f1db12e3ef904abfc7e9c2e83310e][Magit forge for Gitlab in Doom Emacs]].
 
+<<personal_info_gpg>>
 This is used by GPG and other things.
 
 ** First: Installation and Key-Pair Generation
@@ -2881,6 +2880,13 @@ $ pipenv run python main.py
 
 * Magit
 
+References:
+- Youtube: [[https://www.youtube.com/watch?v=_zfvQkJsYwI][System Crafters: An Introduction to the Ultimage Git Interface, Magit!]]
+- Youtube: [[https://www.youtube.com/watch?v=zM7K1y4h6UQ][System Crafters: Fix Your Git Commits Like a Rebase Expert with Magit]]
+- Youtube: [[https://www.youtube.com/watch?v=qPfJoeQCIvA][System Crafters: 9 Techniques to Boost Your Git Workflow with Magit]]
+- [[https://www.lvguowei.me/post/magit-rebase/][Guowei Lv: Magit Tutorial - Rebase (Part I)]]
+- [[https://www.lvguowei.me/post/magit-rebase-2/][Guowei Lv: Magit Tutorial - Rebase (Part II)]]
+
 Some configuration:
 
 #+begin_src emacs-lisp
@@ -2933,27 +2939,32 @@ not from magit, and it's already in melpa. But I prefer latest:
     (global-blamer-mode 1))
 #+end_src
 
-References:
-- [[https://www.lvguowei.me/post/magit-rebase/][Guowei Lv: Magit Tutorial - Rebase (Part I)]]
-- [[https://www.lvguowei.me/post/magit-rebase-2/][Guowei Lv: Magit Tutorial - Rebase (Part II)]]
-
 ** Forge
 
-Pre-requisite: GnuPG is setup and running within emacs. See: ...
+Reference:
 
-*** 1st Step: Create a token for your forge.
+- Youtube: [[https://www.youtube.com/watch?v=fFuf3hExF5w][Zaiste: Emacs Magit with Forge for Issuing Pull Requests]]
+- Youtube: [[https://www.youtube.com/watch?v=Qj4eRccsos8][Zaiste: Emacs Magit with Forge for merging Pull Requests]]
+- [[https://magit.vc/manual/forge.html][Forge User and Developer Manual]]
+- [[https://docs.doomemacs.org/v21.12/modules/tools/magit/][doom emacs: forge setting]].
+- [[https://gist.github.com/Azeirah/542f1db12e3ef904abfc7e9c2e83310e][Magit forge for Gitlab in Doom Emacs]].
+- [[https://github.com/magit/forge/wiki/Tips-and-Tricks#using-ssh-identities][Forge: Tips and Tricks]]
 
-- Github: [[https://github.com/settings/tokens]], Requires =repo=,
-  =user= and =read:org= scopes
+Pre-requisite: GnuPG is setup and running within emacs. See: [[personal_info_gpg][Personal Info and GPG]].
+
+*** Create a token for your forge.
+
+- Github: [[https://github.com/settings/tokens]]
+  + Requires: =repo=, =user= and =read:org= scopes
 - Gitlab: TBD
 
-*** 2nd Step: Register your username for your forge
+*** Register your username for your forge
 
 #+begin_example
 $ git config --global github.user USERNAME
 #+end_example
 
-*** 3rd Step: Add the following to your =~/.authinfo.gpg=.
+*** Add the following to your =~/.authinfo.gpg=.
 
 Replace =USERNAME= and =TOKENSECRET= with yours:
 
@@ -2961,13 +2972,41 @@ Replace =USERNAME= and =TOKENSECRET= with yours:
 machine api.github.com login USERNAME^forge password TOKENSECRET
 #+end_example
 
-*** 4th Step: Startup your magit
+*** Add a remote name that Forge can understand
+
+See [[https://magit.vc/manual/forge/Repository-Detection.html][Forge Repository Detection]].
+
+Add a new remote name =upstream= that Forge understand it:
+
+#+begin_example
+$ git remote add upstream https://github.com/gandalf/dotdoomemacs.git
+#+end_example
+
+Pay attention for the above format, to use =/= instead of =:= before =gandalf=.
+
+*** Startup your magit
 
 #+begin_example
 M-x magit-status
 #+end_example
 
-*** Pull all forge topics with =@ f= (evil users)
+**** Firstly, forge-pull to pull topic from forge repository
+
+If there is pull request, it will be shown:
+#+begin_example
+M-x forge-pull
+
+Head:     master Update lah
+Merge:    gitpi/master Update lah
+
+Recent commits
+571fae2 master gitpi/master github/master Update lah
+b1e58e3 Update upstrame
+
+Pull requests (1)
+#+end_example
+
+**** List all topics: =@ f f=
 
 * Project Management
 
